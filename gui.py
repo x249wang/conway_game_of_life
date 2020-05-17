@@ -33,8 +33,6 @@ class GameOfLifeBoard(object):
     )
     self.canvas.pack()
 
-    self.padding_per_side = self.simulation.padding // 2
-
     self.color_map = {0: 'white', 1: 'black'}
 
     self.cells = {}
@@ -42,10 +40,7 @@ class GameOfLifeBoard(object):
 
   def get_cell_state_color(self, row_idx, col_idx):
 
-    cell_state = self.simulation.grid[
-      row_idx + self.padding_per_side, 
-      col_idx + self.padding_per_side
-    ]
+    cell_state = self.simulation.grid[row_idx, col_idx]
 
     cell_color = self.color_map[cell_state]
 
@@ -89,7 +84,7 @@ class GameOfLifeBoard(object):
           fill = cell_color
         )
 
-    self.canvas.after(200, self.update_board)
+    self.canvas.after(1000, self.update_board)
 
 
   def run(self):

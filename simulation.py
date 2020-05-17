@@ -14,8 +14,6 @@ class GameOfLifeSimulation(object):
 
         self.initial_pattern = initial_pattern
 
-        self.padding = 100
-
         if self.initial_pattern is not None:
 
             self.grid_height = self.initial_pattern.shape[0]
@@ -26,9 +24,6 @@ class GameOfLifeSimulation(object):
             self.grid_height = grid_height
             self.grid_width = grid_width
 
-        self.padded_height = self.grid_height + self.padding
-        self.padded_width = self.grid_width + self.padding
-
         self.random_state = random_state
         self.initial_proportion = initial_proportion
 
@@ -37,12 +32,7 @@ class GameOfLifeSimulation(object):
 
         if self.initial_pattern is not None:
 
-            self.grid = np.pad(
-                self.initial_pattern,
-                pad_width = (self.padding // 2, self.padding // 2),
-                mode = 'constant',
-                constant_values = 0
-            )
+            self.grid = self.initial_pattern
         
         else:
 
@@ -50,7 +40,7 @@ class GameOfLifeSimulation(object):
             
             self.grid = np.random.choice(
                 [0, 1], 
-                (self.padded_height, self.padded_width),
+                (self.grid_height, self.grid_width),
                 p = [1 - self.initial_proportion, self.initial_proportion]
             )
 
@@ -62,10 +52,9 @@ class GameOfLifeSimulation(object):
             range(coord_c - 1, coord_c + 2)
         ))
 
-        neighbors = [neighbor for neighbor in neighbors \
-                         if neighbor != (coord_r, coord_c) and \
-                         0 <= neighbor[0] < self.padded_height and \
-                         0 <= neighbor[1] < self.padded_width]
+        neighbors = [(neighbor[0] % self.grid_height, neighbor[1] % self.grid_width)
+                     for neighbor in neighbors 
+                     if neighbor != (coord_r, coord_c)]
         
         neighbors_r, neighbors_c = map(list, zip(*neighbors))
 
@@ -76,9 +65,9 @@ class GameOfLifeSimulation(object):
 
         grid_snapshot = self.grid.copy()
 
-        for row_i in range(self.padded_height):
+        for row_i in range(self.grid_height):
 
-            for col_i in range(self.padded_width):
+            for col_i in range(self.grid_width):
                 
                 cell_state = grid_snapshot[row_i, col_i]
 
@@ -89,8 +78,10 @@ class GameOfLifeSimulation(object):
 
                 if cell_state and (2 <= num_alive <= 3):
                     self.grid[row_i, col_i] = 1
+
                 elif not cell_state and num_alive == 3:
                     self.grid[row_i, col_i] = 1
+                    
                 else:
                     self.grid[row_i, col_i] = 0
 

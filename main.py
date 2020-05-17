@@ -10,13 +10,13 @@ board.run()
 
 import numpy as np
 
-oscillating_pattern = np.array(
+oscillator = np.array(
   [[0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 0, 0], 
     [0, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0], 
     [0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0]]
 )
 simulation = GameOfLifeSimulation(
-  initial_pattern = oscillating_pattern
+  initial_pattern = oscillator
 )
 
 board = GameOfLifeBoard(simulation)
