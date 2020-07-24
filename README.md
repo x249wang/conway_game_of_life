@@ -5,4 +5,4 @@ To start, refer to `main.py`.
 
 Demo of what the simulation looks like:
 
-![demo](demo/demo.gif)
+<img src="demo/demo.gif" width="400" height="400">
