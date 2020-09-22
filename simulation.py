@@ -1,7 +1,8 @@
 
 import numpy as np
 import itertools
-from constants import *
+from constants import ALIVE_STATE, DEAD_STATE
+
 
 class GameOfLifeSimulation(object):
 
@@ -69,7 +70,6 @@ class GameOfLifeSimulation(object):
         self.random_state = random_state
         self.init_alive_proportion = init_alive_proportion
 
-
     def initialize(self):
         '''
         Initializes the Game of Life grid based on configurations provided
@@ -82,11 +82,10 @@ class GameOfLifeSimulation(object):
             np.random.seed(self.random_state)
 
             self.grid = np.random.choice(
-                a = [DEAD_STATE, ALIVE_STATE],
-                size = (self.grid_height, self.grid_width),
-                p = [1 - self.init_alive_proportion, self.init_alive_proportion]
+                a=[DEAD_STATE, ALIVE_STATE],
+                size=(self.grid_height, self.grid_width),
+                p=[1 - self.init_alive_proportion, self.init_alive_proportion]
             )
-
 
     def update(self):
         '''
@@ -98,7 +97,6 @@ class GameOfLifeSimulation(object):
         for row_index in range(self.grid_height):
             for column_index in range(self.grid_width):
                 self.update_cell(grid_snapshot, row_index, column_index)
-
 
     def update_cell(self, grid_snapshot, row_index, column_index):
         '''
@@ -117,10 +115,11 @@ class GameOfLifeSimulation(object):
             row_index, column_index,
             self.grid_height, self.grid_width
         )
-        neighbor_states = grid_snapshot[neighbor_row_indices, neighbor_column_indices]
+        neighbor_states = grid_snapshot[neighbor_row_indices,
+                                        neighbor_column_indices]
 
-        self.grid[row_index, column_index] = self.get_next_cell_state(cell_state, neighbor_states)
-
+        self.grid[row_index, column_index] = self.get_next_cell_state(
+            cell_state, neighbor_states)
 
     @staticmethod
     def get_neighbors(row_index, column_index, height_limit, width_limit):
@@ -154,10 +153,10 @@ class GameOfLifeSimulation(object):
             for neighbor in neighbor_block
             if neighbor != (row_index, column_index)
         ]
-        
-        neighbor_row_indices, neighbor_column_indices = map(list, zip(*neighbor_block))
+
+        neighbor_row_indices, neighbor_column_indices = map(
+            list, zip(*neighbor_block))
         return neighbor_row_indices, neighbor_column_indices
-    
 
     @staticmethod
     def get_next_cell_state(cell_state, neighbor_states):
