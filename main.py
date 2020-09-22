@@ -1,5 +1,5 @@
 
-# Tests Game of Life simulation animation
+# Runs Game of Life simulation animation
 
 from simulation import GameOfLifeSimulation
 from gui import GameOfLifeBoard
@@ -14,13 +14,16 @@ board.run()
 # import numpy as np
 
 # oscillator = np.array(
-#   [[0, 0, 0, 0, 0, 0], [0, 1, 1, 0, 0, 0], 
-#     [0, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0], 
-#     [0, 0, 0, 1, 1, 0], [0, 0, 0, 0, 0, 0]]
+#   [[0, 0, 0, 0, 0, 0], 
+#   [0, 1, 1, 0, 0, 0],
+#   [0, 1, 1, 0, 0, 0], 
+#   [0, 0, 0, 1, 1, 0], 
+#   [0, 0, 0, 1, 1, 0], 
+#   [0, 0, 0, 0, 0, 0]]
 # )
-# 
+
 # simulation = GameOfLifeSimulation(
-#   initial_pattern = oscillator
+#   init_pattern = oscillator
 # )
 
 # board = GameOfLifeBoard(simulation)

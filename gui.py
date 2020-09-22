@@ -1,6 +1,7 @@
 
 import tkinter as tk
 from simulation import GameOfLifeSimulation
+from constants import *
 
 class GameOfLifeBoard(object):
 	'''
@@ -33,96 +34,118 @@ class GameOfLifeBoard(object):
 		self.simulation = simulation
 
 		self.root = tk.Tk()
-		self.root.title("Conway's Game of Life")
+		self.root.title(WINDOW_TITLE)
 
-		self.canvas_height = min(
-			self.simulation.grid_height * 20,
-			750
-		)
+		self.canvas_height = min(self.simulation.grid_height * CANVAS_HEIGHT_MULTIPLIER, MIN_CANVAS_HEIGHT)
 		self.canvas_width = self.canvas_height * self.simulation.grid_width / self.simulation.grid_height
 
 		self.cell_height = self.canvas_height / self.simulation.grid_height    
 		self.cell_width = self.canvas_width / self.simulation.grid_width
 
 		self.canvas = tk.Canvas(
-			self.root, 
-			width = self.canvas_width, 
+			self.root,
+			width = self.canvas_width,
 			height = self.canvas_height,
-			borderwidth = 0, 
-			highlightthickness = 0
+			borderwidth = CANVAS_NO_BORDER_SIZE,
+			highlightthickness = CANVAS_NO_HIGHLIGHT,
 		)
 		self.canvas.pack()
 
-		self.color_map = {0: 'white', 1: 'black'}
+		self.color_map = {DEAD_STATE: DEAD_COLOR, ALIVE_STATE: ALIVE_COLOR}
 
 		self.cells = {}
 
-
-	def get_cell_state_color(self, row_idx, col_idx):
-		'''
-		Obtain color of the cell based on its state.
-
-		Args:
-			row_idx (int): row index of cell
-			col_idx (int): column index of cell
-		
-		Returns:
-			string specifying color of the cell ("white" for dead; "black" for white)
-		'''
-
-		cell_state = self.simulation.grid[row_idx, col_idx]
-
-		cell_color = self.color_map[cell_state]
-
-		return cell_color
+		self.simulation.initialize()
+		self.draw_board()
 
 
 	def draw_board(self):
 		'''
-		Draws the initial pattern of the board
+		Sets up board on canvas
 		'''
 
-		self.simulation.initialize()
+		for row_index in range(self.simulation.grid_height):
+			for column_index in range(self.simulation.grid_width):
+				self.draw_cell(row_index, column_index)
 
-		for row_i in range(self.simulation.grid_height):
-			
-			for col_i in range(self.simulation.grid_width):
 
-				cell_color = self.get_cell_state_color(row_i, col_i)
+	def draw_cell(self, row_index, column_index):
+		'''
+		Adds a new cell (i.e. rectangle) onto the canvas, specified by 
+		its location (row and column)
 
-				self.cells[row_i, col_i] = self.canvas.create_rectangle(
-					(
-						col_i * self.cell_width, 
-						row_i * self.cell_height,
-						(col_i + 1) * self.cell_width,
-						(row_i + 1)* self.cell_height
-					),
-					outline = '',
-					fill = cell_color
-				)
-			
+		Args:
+			row_index (int): row location of the cell of interest
+			column_index (int): column location of the cell of interest
+		'''
+
+		self.cells[row_index, column_index] = self.canvas.create_rectangle(
+			(
+				column_index * self.cell_width, 
+				row_index * self.cell_height,
+				(column_index + 1) * self.cell_width,
+				(row_index + 1)* self.cell_height
+			),
+				outline = CANVAS_NO_OUTLINE,
+				fill = DEAD_COLOR
+		)
+
 
 	def update_board(self):
 		'''
-		Updates the board at each step in time based on changes in cell states.
-
-		Note: currently set to update every 1 second
+		Performs one step of update to the board based on changes in cell states.
+		Currently set to update every 1 second
 		'''
+
+		for row_index in range(self.simulation.grid_height):
+			for column_index in range(self.simulation.grid_width):
+				self.update_cell_color(row_index, column_index)
 
 		self.simulation.update()
 
-		for row_i in range(self.simulation.grid_height):
+		self.canvas.after(UPDATE_DELAY_MS, self.update_board)
 
-			for col_i in range(self.simulation.grid_width):
 
-				cell_color = self.get_cell_state_color(row_i, col_i)
+	def update_cell_color(self, row_index, column_index):
+		'''
+		Updates the color of a cell on the canvas according to its new state
 
-				self.canvas.itemconfig(
-					self.cells[row_i, col_i], 
-					fill = cell_color
-				)
+		Args:
+			row_index (int): row location of the cell of interest
+			column_index (int): column location of the cell of interest
+		'''
 
-		self.canvas.after(1000, self.update_board)
+		cell_color = self.get_cell_color(
+			self.simulation.grid, 
+			row_index, 
+			column_index, 
+			self.color_map
+		)
+
+		self.canvas.itemconfig(
+			self.cells[row_index, column_index], 
+			fill = cell_color
+		)
+
+	@staticmethod
+	def get_cell_color(grid, row_index, column_index, color_map):
+		'''
+		Obtains the color of a given cell on the board.
+
+		Args:
+			grid (numpy.ndarray): matrix tracking states of cells on grid
+			row_index (int): row index of cell of interest
+			column_index (int): column index of cell of interest
+			color_map (dict): dictionary mapping cell states to their respective color values
+		
+		Returns:
+			string specifying color of the cell
+		'''
+
+		cell_state = grid[row_index, column_index]
+		cell_color = color_map[cell_state]
+
+		return cell_color
 
 
 	def run(self):
@@ -131,7 +154,6 @@ class GameOfLifeBoard(object):
 		initial pattern and then updating it step by step.
 		'''
 
-		self.draw_board()
 		self.update_board()
 		self.root.mainloop()
 
